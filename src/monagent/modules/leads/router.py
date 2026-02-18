@@ -11,7 +11,7 @@ class BaseLead(BaseModel):
     pain: str | None = None  # dor principal
     json_data: dict | None = None  # campo genérico para dados adicionais
 
-@router.post("/base-lead")
+@router.post("/lead")
 def create_lead(payload: BaseLead):
     # MVP: só retorna. Depois pluga Supabase/DB/CRM/Resend/Stripe etc.
     return {"created": True, "lead": payload.model_dump()}
