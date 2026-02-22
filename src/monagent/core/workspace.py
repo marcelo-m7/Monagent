@@ -10,6 +10,40 @@
 import os
 import shutil
 
+class PythonProjectTemplate:
+    ROOT_FOLDERS = ["src", "tests", "docs", "data"]
+    FOLDERS_LAVEL_2 = {
+        "src": ["api", "app", "models"],
+        "tests": ["unit", "integration"],
+        "docs": ["design", "user_manual"],
+    }
+    FILES_LAVEL_2 = {
+        "src": ["main.py", "__init__.py"],
+        "tests": ["test_main.py", "__init__.py"],
+        "docs": ["README.md"],
+    }  
+    FOLDERS_LAVEL_3 = {
+        "src/api": ["v1"],
+        "src/app": ["models", "services", "controllers"],
+    }
+    FILES_LAVEL_3 = {
+        "src/app/models": ["abstract.py", "__init__.py"],
+        "src/app/services": ["abstract.py", "__init__.py"],
+        "src/app/controllers": ["abstract.py", "__init__.py"],
+        "src/api/v1": ["endpoints.py", "__init__.py"],
+    }
+    
+    def __init__(self, name: str, description: str, files: dict[str, str]):
+        self.name = name
+        self.description = description
+        self.files = files
+    
+
+class Project:
+    def __init__(self, name: str):
+        self.name = name
+    
+
 class FileManager:
     base_path: str
     project_name: str
