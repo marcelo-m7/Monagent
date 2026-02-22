@@ -142,8 +142,9 @@ class FileManager:
         shutil.move(old_file_path, new_file_path)
     
     
-class Workspace(FileManager):
+class Workspace(FileManager):    
     projects: Dict[str, Project]
+    current_project: str | None
     
     def __init__(self, user_id: str):
         self.user_id = user_id
@@ -155,6 +156,25 @@ class Workspace(FileManager):
         self.projects = {}
         self.current_project = None
 
+    def list_projects(self) -> list[str]:
+        return list(self.projects.keys())
+    
+    def switch_project(self, project_name: str):
+        if project_name in self.projects:
+            self.current_project = project_name
+        else:
+            raise ValueError(f"Project '{project_name}' does not exist.")
+   
+    def get_current_project(self) -> str | None:
+        return self.current_project
+    
+    
+    def get_project(self, project_name: str) -> Project:
+        if project_name in self.projects:
+            return self.projects[project_name]
+        else:
+            raise ValueError(f"Project '{project_name}' does not exist.")
+        
     def create_project(self, project_name: str):
         self.projects[project_name] = Project(project_name)
         project_path = os.path.join(self.base_path, project_name)
