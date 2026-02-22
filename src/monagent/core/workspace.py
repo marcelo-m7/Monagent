@@ -133,9 +133,39 @@ class FileManager:
         os.makedirs(new_project_path, exist_ok=True)
         new_file_path = os.path.join(new_project_path, file_name)
         shutil.move(old_file_path, new_file_path)
+
+
+class PythonFrontendCRUD:
+    def create_component(self, component_name: str):
+        return f"Creating frontend component '{component_name}'..."
+    def retrieve_component(self, component_name: str):
+        return f"Retrieving frontend component '{component_name}'..."
+    def update_component(self, component_name: str):
+        return f"Updating frontend component '{component_name}'..."
+    def delete_component(self, component_name: str):
+        return f"Deleting frontend component '{component_name}'..."
+
+class PythonBackendFastAPI:
+    def create_endpoint(self, endpoint_name: str):
+        return f"Creating FastAPI endpoint '{endpoint_name}'..."
+    def retrieve_endpoint(self, endpoint_name: str):
+        return f"Retrieving FastAPI endpoint '{endpoint_name}'..."
+    def update_endpoint(self, endpoint_name: str):
+        return f"Updating FastAPI endpoint '{endpoint_name}'..."
+    def delete_endpoint(self, endpoint_name: str):
+        return f"Deleting FastAPI endpoint '{endpoint_name}'..."
     
-class PythonProjectCreator:
+class PythonBackendCRUD:
+    def create_endpoint(self, endpoint_name: str):
+        return f"Creating backend endpoint '{endpoint_name}'..."
+    def retrieve_endpoint(self, endpoint_name: str):
+        return f"Retrieving backend endpoint '{endpoint_name}'..."
+    def update_endpoint(self, endpoint_name: str):
+        return f"Updating backend endpoint '{endpoint_name}'..."
+    def delete_endpoint(self, endpoint_name: str):
+        return f"Deleting backend endpoint '{endpoint_name}'..."
     
+class PythonProjectManager:
     def stages(self, stage: str):
         if stage == "setup_virtualenv":
             return self.setup_virtualenv
@@ -151,6 +181,14 @@ class PythonProjectCreator:
             return self.create_main_file
         else:
             raise ValueError(f"Unknown stage: {stage}")
+    def install_dependencies(self, directory: str, dependencies: list[str]):
+        venv_path = os.path.join(directory, "venv")
+        for dep in dependencies:
+            os.system(f"{os.path.join(venv_path, 'bin', 'pip')} install {dep}")
+    
+    def create_structure(self, directory: str):
+        os.makedirs(os.path.join(directory, "backend"), exist_ok=True)
+        os.makedirs(os.path.join(directory, "frontend"), exist_ok=True)
     
     def get_stage_description(self, stage: str) -> str:
         descriptions = {
