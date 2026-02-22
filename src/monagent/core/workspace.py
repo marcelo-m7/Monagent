@@ -9,35 +9,101 @@
 
 import os
 import shutil
+from dataclasses import dataclass
+from typing import Dict, List
 
-class PythonProjectTemplate:
-    ROOT_FOLDERS = ["src", "tests", "docs", "data"]
-    FOLDERS_LAVEL_2 = {
-        "src": ["api", "app", "models"],
-        "tests": ["unit", "integration"],
-        "docs": ["design", "user_manual"],
-    }
-    FILES_LAVEL_2 = {
-        "src": ["main.py", "__init__.py"],
-        "tests": ["test_main.py", "__init__.py"],
-        "docs": ["README.md"],
-    }  
-    FOLDERS_LAVEL_3 = {
-        "src/api": ["v1"],
-        "src/app": ["models", "services", "controllers"],
-    }
-    FILES_LAVEL_3 = {
-        "src/app/models": ["abstract.py", "__init__.py"],
-        "src/app/services": ["abstract.py", "__init__.py"],
-        "src/app/controllers": ["abstract.py", "__init__.py"],
-        "src/api/v1": ["endpoints.py", "__init__.py"],
-    }
+@dataclass
+class DirectoryStructure:
+    """Defines a directory structure with folders and files at each level."""
+    folders: List[str]
+    substructure: Dict[str, "DirectoryStructure"] = None
+    files: List[str] = None
     
-    def __init__(self, name: str, description: str, files: dict[str, str]):
+    def __post_init__(self):
+        if self.substructure is None:
+            self.substructure = {}
+        if self.files is None:
+            self.files = []
+
+
+class ProjectTemplate:
+    """Base class for project templates with robust folder structure setup."""
+    
+    STRUCTURE: DirectoryStructure = None
+    
+    def __init__(self, name: str, description: str = ""):
         self.name = name
         self.description = description
-        self.files = files
     
+    @classmethod
+    def create_structure(cls, base_path: str, structure: DirectoryStructure, current_path: str = ""):
+        """Recursively creates the directory structure."""
+        for folder in structure.folders:
+            folder_path = os.path.join(current_path, folder) if current_path else folder
+            full_path = os.path.join(base_path, folder_path)
+            os.makedirs(full_path, exist_ok=True)
+            
+            # Create files at this level
+            for file in structure.files:
+                file_path = os.path.join(full_path, file)
+                if not os.path.exists(file_path):
+                    open(file_path, "a").close()
+            
+            # Recursively create substructures
+            if folder in structure.substructure:
+                cls.create_structure(base_path, structure.substructure[folder], folder_path)
+
+
+class PythonProjectTemplate(ProjectTemplate):
+    """Template for Python projects with predefined structure."""
+    
+    STRUCTURE = DirectoryStructure(
+        folders=["src", "tests", "docs", "data"],
+        files=[],
+        substructure={
+            "src": DirectoryStructure(
+                folders=["api", "app", "models"],
+                files=["main.py", "__init__.py"],
+                substructure={
+                    "api": DirectoryStructure(
+                        folders=["v1"],
+                        files=[],
+                        substructure={
+                            "v1": DirectoryStructure(
+                                folders=[],
+                                files=["endpoints.py", "__init__.py"]
+                            )
+                        }
+                    ),
+                    "app": DirectoryStructure(
+                        folders=["models", "services", "controllers"],
+                        files=[],
+                        substructure={
+                            "models": DirectoryStructure(folders=[], files=["abstract.py", "__init__.py"]),
+                            "services": DirectoryStructure(folders=[], files=["abstract.py", "__init__.py"]),
+                            "controllers": DirectoryStructure(folders=[], files=["abstract.py", "__init__.py"]),
+                        }
+                    )
+                }
+            ),
+            "tests": DirectoryStructure(
+                folders=["unit", "integration"],
+                files=["test_main.py", "__init__.py"],
+            ),
+            "docs": DirectoryStructure(
+                folders=["design", "user_manual"],
+                files=["README.md"],
+            ),
+        }
+    )
+    
+    def __init__(self, name: str, description: str = ""):
+        super().__init__(name, description)
+    
+    def setup(self, base_path: str):
+        """Sets up the project structure at the given base path."""
+        project_path = os.path.join(base_path, self.name)
+        self.create_structure(project_path, self.STRUCTURE)
 
 class Project:
     def __init__(self, name: str):
