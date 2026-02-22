@@ -1,11 +1,4 @@
 # TODO: Setup a workspace directory where all the agent's files and user files will be stored. Tasks:
-# - Create a unique directory for each user, using its name or ID, to keep its files organized and separate from other users
-# - Inside each user's directory, create subdirectories for different projects or tasks, to further organize the files and make it easier to find them
-# - Implement a function to save files to the appropriate directory based on the user's ID and the project or task they are working on, ensuring that files are stored in the correct location and can be easily accessed when needed
-# - Implement a function to retrieve files from the workspace based on the user's ID and the project or task they are working on, allowing users to easily access their files when needed
-# - Implement a function to delete files from the workspace when they are no longer needed, to keep the workspace organized and free of unnecessary files
-# - Implement a function to list all files in the workspace for a given user, to provide an overview of the files they have stored and make it easier to find specific files when needed
-# - Implement a function to move files between different directories in the workspace, to allow users to reorganize their files as needed and keep their workspace organized
 
 import os
 import shutil
@@ -140,6 +133,82 @@ class FileManager:
         os.makedirs(new_project_path, exist_ok=True)
         new_file_path = os.path.join(new_project_path, file_name)
         shutil.move(old_file_path, new_file_path)
+    
+class PythonProjectCreator:
+    
+    def stages(self, stage: str):
+        if stage == "setup_virtualenv":
+            return self.setup_virtualenv
+        elif stage == "install_dependencies":
+            return self.install_dependencies
+        elif stage == "create_structure":
+            return self.create_structure
+        elif stage == "create_backend":
+            return self.create_backend
+        elif stage == "create_frontend":
+            return self.create_frontend
+        elif stage == "create_main_file":
+            return self.create_main_file
+        else:
+            raise ValueError(f"Unknown stage: {stage}")
+    
+    def get_stage_description(self, stage: str) -> str:
+        descriptions = {
+            "setup_virtualenv": "Sets up a virtual environment for the project.",
+            "install_dependencies": "Installs project dependencies.",
+            "create_structure": "Creates the basic project structure.",
+            "create_backend": "Creates the backend components.",
+            "create_frontend": "Creates the frontend components.",
+            "create_main_file": "Creates the main application file."
+        }
+        return descriptions.get(stage, f"No description available for stage '{stage}'")
+    
+    def setup_virtualenv(self, directory: str):
+        os.system(f"python -m venv {os.path.join(directory, 'venv')}")
+        os.system(f"{os.path.join(directory, 'venv', 'bin', 'pip')} install --upgrade pip")
+        os.system(f"{os.path.join(directory, 'venv', 'bin', 'pip')} install -r requirements.txt")
+
+    def create_backend(self, directory: str):
+        os.makedirs(os.path.join(directory, "backend"), exist_ok=True)
+        # TODO: Create a base fastapi app structure with main.py, routers, and models
+        
+    def create_frontend(self, directory: str):
+        os.makedirs(os.path.join(directory, "frontend"), exist_ok=True)
+        # TODO: Create a base Flet app structure with main.py and components
+        
+    def create_main_file(self, backend_directory: str, frontend_directory: str):
+        main_file_path = os.path.join(backend_directory, "main.py")
+        with open(main_file_path, "w") as f:
+            f.write("# TODO: Implement the main application logic here\n")
+            f.write("if __name__ == '__main__':\n")
+            f.write("    print('Hello, World!')\n")
+            
+            
+class WorkspaceTools:
+    def execute_command(self, command: str) -> str:
+        """Executes a shell command and returns the output."""
+        result = os.popen(command).read()
+        return result
+    
+    def execute_python_script(self, project_name: str, script_name: str) -> str:
+        """Executes a Python script from the specified project and returns the output."""
+        script_path = os.path.join(self.base_path, project_name, script_name)
+        result = os.popen(f"python {script_path}").read()
+        return result
+
+    def setup_virtualenv(self, project_name: str):
+        """Sets up a virtual environment for the specified project."""
+        project_path = os.path.join(self.base_path, project_name)
+        os.makedirs(project_path, exist_ok=True)
+        os.system(f"python -m venv {os.path.join(project_path, 'venv')}")
+    
+    def install_dependencies(self, project_name: str, dependencies: list[str]):
+        """Installs dependencies in the project's virtual environment."""
+        project_path = os.path.join(self.base_path, project_name)
+        venv_path = os.path.join(project_path, "venv")
+        for dep in dependencies:
+            os.system(f"{os.path.join(venv_path, 'bin', 'pip')} install {dep}")
+    
     
     
 class Workspace(FileManager):    
