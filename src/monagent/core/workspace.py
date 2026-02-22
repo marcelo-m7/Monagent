@@ -185,3 +185,10 @@ class Workspace(FileManager):
             del self.projects[project_name]
         project_path = os.path.join(self.base_path, project_name)
         shutil.rmtree(project_path)
+
+    def list_projects_templates(self) -> list[str]:
+        return ["python"]  # TODO: Implement a way to list available templates dynamically
+    
+    def create_project_from_template(self, template: ProjectTemplate):
+        template.create_structure(base_path=self.base_path, structure=template.STRUCTURE)
+        self.projects[template.name] = Project(template.name)
