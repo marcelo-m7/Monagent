@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from monagent.modules.leads.router import router as leads_router
+from dotenv import load_dotenv
+load_dotenv()  # Carrega as variáveis de ambiente do arquivo .env
 
 app = FastAPI(
     title="Monagent",

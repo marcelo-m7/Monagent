@@ -1,18 +1,35 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, EmailStr
+from monagent.core.supabase_client import supabase_service
+from monagent.modules.leads.service import insert_lead
 
 router = APIRouter()
 
-class BaseLead(BaseModel):
+class LeadCreate(BaseModel):
     email: EmailStr
     name: str | None = None
     company: str | None = None
-    revenue: int | None = None
-    pain: str | None = None  # dor principal
-    json_data: dict | None = None  # campo genérico para dados adicionais
+    pain: str | None = None
 
-@router.post("/base-lead")
-def create_lead(payload: BaseLead):
-    # MVP: só retorna. Depois pluga Supabase/DB/CRM/Resend/Stripe etc.
-    return {"created": True, "lead": payload.model_dump()}
+    source: str | None = None
+    campaign: str | None = None
+    medium: str | None = None
+    content: str | None = None
+    term: str | None = None
 
+@router.post("")
+def create_lead(payload: LeadCreate, request: Request):
+    sb = supabase_service()
+
+    ip = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+
+    lead = insert_lead(
+        sb,
+        {
+            **payload.model_dump(),
+            "ip": ip,
+            "user_agent": user_agent,
+        },
+    )
+    return {"created": True, "lead_id": lead["id"]}
