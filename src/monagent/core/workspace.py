@@ -143,10 +143,25 @@ class FileManager:
     
     
 class Workspace(FileManager):
+    projects: Dict[str, Project]
+    
     def __init__(self, user_id: str):
         self.user_id = user_id
         self.base_path = f"./workspace/{user_id}"
         # Create the base directory for the user if it doesn't exist
         os.makedirs(self.base_path, exist_ok=True)
+        
+        # Projects settings
+        self.projects = {}
+        self.current_project = None
 
-
+    def create_project(self, project_name: str):
+        self.projects[project_name] = Project(project_name)
+        project_path = os.path.join(self.base_path, project_name)
+        os.makedirs(project_path, exist_ok=True)
+    
+    def delete_project(self, project_name: str):
+        if project_name in self.projects:
+            del self.projects[project_name]
+        project_path = os.path.join(self.base_path, project_name)
+        shutil.rmtree(project_path)
