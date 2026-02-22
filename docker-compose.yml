@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  monagent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: monagent-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Override these in production with proper values
+      - ENV=production
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - SUPABASE_SCHEMA=${SUPABASE_SCHEMA:-monagent}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - monagent-network
+
+networks:
+  monagent-network:
+    driver: bridge
