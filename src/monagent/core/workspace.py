@@ -10,14 +10,10 @@
 import os
 import shutil
 
-
-class Workspace:
-    def __init__(self, user_id: str):
-        self.user_id = user_id
-        self.base_path = f"./workspace/{user_id}"
-        # Create the base directory for the user if it doesn't exist
-        os.makedirs(self.base_path, exist_ok=True)
-
+class FileManager:
+    base_path: str
+    project_name: str
+    
     def save_file(self, project_name: str, file_name: str, content: str):
         project_path = os.path.join(self.base_path, project_name)
         os.makedirs(project_path, exist_ok=True)
@@ -44,3 +40,13 @@ class Workspace:
         os.makedirs(new_project_path, exist_ok=True)
         new_file_path = os.path.join(new_project_path, file_name)
         shutil.move(old_file_path, new_file_path)
+    
+    
+class Workspace(FileManager):
+    def __init__(self, user_id: str):
+        self.user_id = user_id
+        self.base_path = f"./workspace/{user_id}"
+        # Create the base directory for the user if it doesn't exist
+        os.makedirs(self.base_path, exist_ok=True)
+
+
