@@ -1,14 +1,8 @@
 # Sensive data files
-.venv/
-env/
 *.env
 *.env.local
 .env.*.local
 *.secret
-.abstra/secret_key
-.abstra/credentials
-.abstra/session_path
-.abstra/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
