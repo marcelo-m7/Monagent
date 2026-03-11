@@ -175,6 +175,11 @@ cliente_id = insert("clientes", {
 
 print(f"Cliente cadastrado com ID: {cliente_id}")
 
+# Extrai o telefone formatado para exibição
+telefone_display = state['telefone']
+if hasattr(telefone_display, 'masked'):
+    telefone_display = telefone_display.masked
+
 # Página de confirmação
 pagina_confirmacao = [
     MarkdownOutput(f"""
@@ -184,7 +189,7 @@ O cliente **{state['nome']}** foi cadastrado com sucesso.
 
 **Resumo do cadastro:**
 - 📧 E-mail: {state['email']}
-- 📱 Telefone: {state['telefone']}
+- 📱 Telefone: {telefone_display}
 - 🏢 Empresa: {state.get('empresa', 'Não informado')}
 - 💼 Cargo: {state.get('cargo', 'Não informado')}
 
